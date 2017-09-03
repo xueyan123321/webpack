@@ -1,26 +1,32 @@
-{{#if_eq build "standalone"}}
 // The Vue build version to load with the `import` command
 // (runtime-only or standalone) has been set in webpack.base.conf with an alias.
-{{/if_eq}}
-import Vue from 'vue'{{#if_eq lintConfig "airbnb"}};{{/if_eq}}
-import App from './App'{{#if_eq lintConfig "airbnb"}};{{/if_eq}}
-{{#router}}
-import router from './router'{{#if_eq lintConfig "airbnb"}};{{/if_eq}}
-{{/router}}
+import axios from 'axios'
+import VueAxios from 'vue-axios'
+import iView from 'iview'
+import Vue from 'vue'
+import App from './App'
+import router from './router'
+import 'iview/dist/styles/iview.css'
 
-Vue.config.productionTip = false{{#if_eq lintConfig "airbnb"}};{{/if_eq}}
+Vue.use(iView)
+axios.defaults.baseURL = '/api/data'
+axios.interceptors.response.use((response) => {
+  if (response.data.content.errorCode !== 200) {
+    alert('提交错误')
+  } else {
+    return response.data.content
+  }
+}, (error) => {
+  alert('网络错误')
+  return (Promise.reject(error))
+})
+Vue.use(VueAxios, axios)
+Vue.config.productionTip = false
 
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
-  {{#router}}
   router,
-  {{/router}}
-  {{#if_eq build "runtime"}}
-  render: h => h(App){{#if_eq lintConfig "airbnb"}},{{/if_eq}}
-  {{/if_eq}}
-  {{#if_eq build "standalone"}}
   template: '<App/>',
-  components: { App }{{#if_eq lintConfig "airbnb"}},{{/if_eq}}
-  {{/if_eq}}
-}){{#if_eq lintConfig "airbnb"}};{{/if_eq}}
+  components: { App }
+})
